@@ -1,0 +1,95 @@
+location,elf_path,file,line,addr,matched_line,func,func_low,func_high,callers,full_chain,source_path,source_snippet
+test_dwarf.c:278,F:/CodingProjects/filebin/test-elf/test_dwarf.elf,test_dwarf.c,278,0x2604,278,main,9170,10555,,,test_dwarf.c,"256:int main(void) {
+257:    StudentManager mgr;
+258:    const char *db = ""students.txt"";
+259:    StudentManager_init(&mgr, db);
+260:    /* 尝试读取已有数据（若存在） */
+261:    StudentManager_load(&mgr);
+262:
+263:    while (1) {
+264:        printf(""\n学生管理系统\n"");
+265:        printf(""1) 列表  2) 添加  3) 查找  4) 删除  5) 保存  6) 更新  0) 退出\n"");
+266:        printf(""请选择: "");
+267:        char buf[128];
+268:        if (!fgets(buf, sizeof(buf), stdin)) break;
+269:        int cmd = atoi(buf);
+270:        if (cmd == 0) break;
+271:        if (cmd == 1) {
+272:            StudentManager_list(&mgr);
+273:        } else if (cmd == 2) {
+274:            Student s = {0};
+275:            printf(""输入学号: ""); if (!fgets(buf, sizeof(buf), stdin)) break; s.id = atoi(buf);
+276:            printf(""输入姓名: ""); if (!fgets(buf, sizeof(buf), stdin)) break; buf[strcspn(buf, ""\n"")] = '\0'; strncpy(s.name, buf, sizeof(s.name)-1);
+277:            printf(""输入年龄: ""); if (!fgets(buf, sizeof(buf), stdin)) break; s.age = atoi(buf);
+278:            printf(""输入成绩: ""); if (!fgets(buf, sizeof(buf), stdin)) break; s.score = (float)atof(buf);
+279:            if (StudentManager_add(&mgr, &s)) printf(""添加成功\n""); else printf(""添加失败\n"");
+280:        } else if (cmd == 3) {
+281:            printf(""输入学号: ""); if (!fgets(buf, sizeof(buf), stdin)) break; int id = atoi(buf);
+282:            int idx = StudentManager_find_index(&mgr, id);
+283:            if (idx < 0) printf(""未找到学号 %d\n"", id);
+284:            else { Student *p = &mgr.arr[idx]; printf(""%d\t%s\t%d\t%.2f\n"", p->id, p->name, p->age, p->score); }
+285:        } else if (cmd == 4) {
+286:            printf(""输入学号: ""); if (!fgets(buf, sizeof(buf), stdin)) break; int id = atoi(buf);
+287:            if (StudentManager_delete_by_id(&mgr, id)) printf(""已删除\n""); else printf(""未找到学号 %d\n"", id);
+288:        } else if (cmd == 5) {
+289:            StudentManager_save(&mgr); printf(""已保存到 %s\n"", db);
+290:        } else if (cmd == 6) {
+291:            StudentManager_update(&mgr);
+292:        } else {
+293:            printf(""无效选项\n"");
+294:        }
+295:    }
+296:
+297:    /* 退出前自动保存 */
+298:    StudentManager_save(&mgr);
+299:    StudentManager_free(&mgr);
+300:    printf(""退出\n"");
+301:    return 0;
+302:}"
+test_dwarf.c:266,F:/CodingProjects/filebin/test-elf/test_dwarf.elf,test_dwarf.c,266,0x2444,266,main,9170,10555,,,test_dwarf.c,"256:int main(void) {
+257:    StudentManager mgr;
+258:    const char *db = ""students.txt"";
+259:    StudentManager_init(&mgr, db);
+260:    /* 尝试读取已有数据（若存在） */
+261:    StudentManager_load(&mgr);
+262:
+263:    while (1) {
+264:        printf(""\n学生管理系统\n"");
+265:        printf(""1) 列表  2) 添加  3) 查找  4) 删除  5) 保存  6) 更新  0) 退出\n"");
+266:        printf(""请选择: "");
+267:        char buf[128];
+268:        if (!fgets(buf, sizeof(buf), stdin)) break;
+269:        int cmd = atoi(buf);
+270:        if (cmd == 0) break;
+271:        if (cmd == 1) {
+272:            StudentManager_list(&mgr);
+273:        } else if (cmd == 2) {
+274:            Student s = {0};
+275:            printf(""输入学号: ""); if (!fgets(buf, sizeof(buf), stdin)) break; s.id = atoi(buf);
+276:            printf(""输入姓名: ""); if (!fgets(buf, sizeof(buf), stdin)) break; buf[strcspn(buf, ""\n"")] = '\0'; strncpy(s.name, buf, sizeof(s.name)-1);
+277:            printf(""输入年龄: ""); if (!fgets(buf, sizeof(buf), stdin)) break; s.age = atoi(buf);
+278:            printf(""输入成绩: ""); if (!fgets(buf, sizeof(buf), stdin)) break; s.score = (float)atof(buf);
+279:            if (StudentManager_add(&mgr, &s)) printf(""添加成功\n""); else printf(""添加失败\n"");
+280:        } else if (cmd == 3) {
+281:            printf(""输入学号: ""); if (!fgets(buf, sizeof(buf), stdin)) break; int id = atoi(buf);
+282:            int idx = StudentManager_find_index(&mgr, id);
+283:            if (idx < 0) printf(""未找到学号 %d\n"", id);
+284:            else { Student *p = &mgr.arr[idx]; printf(""%d\t%s\t%d\t%.2f\n"", p->id, p->name, p->age, p->score); }
+285:        } else if (cmd == 4) {
+286:            printf(""输入学号: ""); if (!fgets(buf, sizeof(buf), stdin)) break; int id = atoi(buf);
+287:            if (StudentManager_delete_by_id(&mgr, id)) printf(""已删除\n""); else printf(""未找到学号 %d\n"", id);
+288:        } else if (cmd == 5) {
+289:            StudentManager_save(&mgr); printf(""已保存到 %s\n"", db);
+290:        } else if (cmd == 6) {
+291:            StudentManager_update(&mgr);
+292:        } else {
+293:            printf(""无效选项\n"");
+294:        }
+295:    }
+296:
+297:    /* 退出前自动保存 */
+298:    StudentManager_save(&mgr);
+299:    StudentManager_free(&mgr);
+300:    printf(""退出\n"");
+301:    return 0;
+302:}"

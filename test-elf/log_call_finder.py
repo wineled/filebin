@@ -11,7 +11,7 @@ from capstone import Cs, CS_ARCH_ARM, CS_MODE_ARM, CS_ARCH_ARM64, CS_ARCH_X86, C
 
 # ========== 配置区域 ==========
 ELF_PATH = r"F:\CodingProjects\filebin\test-elf\test_dwarf.elf"
-LOCATION = "test_dwarf.c:278"  # 要查的 "文件名:行号"
+LOCATION = "test_dwarf.c:266"  # 要查的 "文件名:行号"
 # =============================
 
 
@@ -67,45 +67,9 @@ def find_addr_by_file_line(dwarfinfo, file, line, include_line=False):
                 continue
 
             fe = file_entries[file_idx]
-            if isinstance(fe, dict):
-                raw_name_b = fe.get('name', b'')
-                dir_idx = fe.get('directory_index', 0)
-            else:
-                raw_name_b = getattr(fe, 'name', None)
-                dir_idx = getattr(fe, 'directory_index', 0)
-                if raw_name_b is None:
-                    raw_name_b = getattr(fe, '_mock_name', None) or getattr(fe, '_mock_new_name', None)
-                # unittest.mock.Mock will create child mocks for unknown attrs;
-                # ensure dir_idx is an int when possible
-                try:
-                    dir_idx = int(dir_idx)
-                except Exception:
-                    dir_idx = 0
-
-            # 仅接受 bytes 或 str 类型作为文件名；其他类型视为空
-            if isinstance(raw_name_b, (bytes, bytearray)):
-                try:
-                    raw_name = raw_name_b.decode()
-                except Exception:
-                    raw_name = ''
-            elif isinstance(raw_name_b, str):
-                raw_name = raw_name_b
-            else:
-                raw_name = ''
-
-            if not raw_name:
+            fname = _resolve_file_path(fe, inc_dirs)
+            if not fname:
                 continue
-
-            # 组装完整路径：目录前缀 + 文件名
-            if dir_idx > 0 and dir_idx <= len(inc_dirs):
-                dir_entry = inc_dirs[dir_idx - 1]
-                try:
-                    dir_prefix = dir_entry.decode() if isinstance(dir_entry, (bytes, bytearray)) else str(dir_entry)
-                except Exception:
-                    dir_prefix = str(dir_entry)
-                fname = dir_prefix.rstrip('/\\') + '/' + raw_name
-            else:
-                fname = raw_name
 
             base = os.path.basename(fname)
             if file == base or file in fname:
@@ -127,6 +91,51 @@ def find_func_by_addr(addr, funcs):
         if low <= addr < high:
             return name, low, high
     return None, None, None
+
+
+def _resolve_file_path(fe, inc_dirs):
+    """从 file_entry (或者 mock/dict) 和 include_directories 中构建完整文件路径字符串，或返回空字符串。"""
+    # 获取原始 name 和 directory_index
+    if isinstance(fe, dict):
+        raw_name_b = fe.get('name', b'')
+        dir_idx = fe.get('directory_index', 0)
+    else:
+        raw_name_b = getattr(fe, 'name', None)
+        dir_idx = getattr(fe, 'directory_index', 0)
+        if raw_name_b is None:
+            raw_name_b = getattr(fe, '_mock_name', None) or getattr(fe, '_mock_new_name', None)
+
+    # 仅接受 bytes 或 str
+    if isinstance(raw_name_b, (bytes, bytearray)):
+        try:
+            raw_name = raw_name_b.decode()
+        except Exception:
+            raw_name = ''
+    elif isinstance(raw_name_b, str):
+        raw_name = raw_name_b
+    else:
+        raw_name = ''
+
+    if not raw_name:
+        return ''
+
+    # 组装完整路径
+    try:
+        dir_i = int(dir_idx)
+    except Exception:
+        dir_i = 0
+
+    if dir_i > 0 and dir_i <= len(inc_dirs):
+        dir_entry = inc_dirs[dir_i - 1]
+        try:
+            dir_prefix = dir_entry.decode() if isinstance(dir_entry, (bytes, bytearray)) else str(dir_entry)
+        except Exception:
+            dir_prefix = str(dir_entry)
+        fname = dir_prefix.rstrip('/\\') + '/' + raw_name
+    else:
+        fname = raw_name
+
+    return fname
 
 
 def get_function_source(dwarfinfo, low, high, prefer_file=None):
@@ -156,35 +165,9 @@ def get_function_source(dwarfinfo, low, high, prefer_file=None):
                 continue
 
             fe = file_entries[file_idx]
-            if isinstance(fe, dict):
-                raw_name_b = fe.get('name', b'')
-                dir_idx = fe.get('directory_index', 0)
-            else:
-                raw_name_b = getattr(fe, 'name', None)
-                dir_idx = getattr(fe, 'directory_index', 0)
-
-            if isinstance(raw_name_b, (bytes, bytearray)):
-                try:
-                    raw_name = raw_name_b.decode()
-                except Exception:
-                    raw_name = ''
-            elif isinstance(raw_name_b, str):
-                raw_name = raw_name_b
-            else:
-                raw_name = ''
-
-            if not raw_name:
+            fname = _resolve_file_path(fe, inc_dirs)
+            if not fname:
                 continue
-
-            if dir_idx > 0 and dir_idx <= len(inc_dirs):
-                dir_entry = inc_dirs[dir_idx - 1]
-                try:
-                    dir_prefix = dir_entry.decode() if isinstance(dir_entry, (bytes, bytearray)) else str(dir_entry)
-                except Exception:
-                    dir_prefix = str(dir_entry)
-                fname = dir_prefix.rstrip('/\\') + '/' + raw_name
-            else:
-                fname = raw_name
 
             files.append((fname, state.line))
 
@@ -429,3 +412,110 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+def analyze_location(elf_path, location, include_line=True, prefer_file=None, search_cwd=True):
+    """外部接口：分析 ELF 中的 `file:line` 并返回结构化结果。
+
+    参数:
+      - elf_path: ELF 文件路径
+      - location: 字符串 `file:line` 或元组 `(file, line)`
+      - include_line: 返回地址时是否同时返回匹配行号（若存在）
+      - prefer_file: 优先匹配的文件名或路径片段（可选）
+      - search_cwd: 当 DWARF 路径找不到时，是否在当前工作目录递归查找源文件
+
+    返回 dict:
+      {
+        'elf_path': ..., 'file': ..., 'line': ..., 'addr': ..., 'matched_line': ...,
+        'func': func_name, 'func_low': low, 'func_high': high,
+        'call_graph': call_graph,
+        'full_chain': full_chain,
+        'callers': callers,
+        'source_path': src_path_or_none,
+        'source_lines': [ (ln, text), ... ] or None
+      }
+    """
+    # 解析参数
+    if isinstance(location, tuple) and len(location) == 2:
+        filename, line_no = location
+    else:
+        m = re.match(r'^(.+):(\d+)$', str(location))
+        if not m:
+            raise ValueError("location must be 'file:line' or (file,line)")
+        filename = m.group(1)
+        line_no = int(m.group(2))
+
+    elf = load_elf(elf_path)
+    dwarfinfo = elf.get_dwarf_info()
+
+    funcs = build_function_map(dwarfinfo)
+
+    addr_info = find_addr_by_file_line(dwarfinfo, filename, line_no, include_line=include_line)
+    if addr_info is None:
+        return {'error': f'未在调试信息中找到 {filename}:{line_no}'}
+
+    if include_line and isinstance(addr_info, tuple):
+        addr, matched_line = addr_info
+    else:
+        addr = addr_info
+        matched_line = None
+
+    name, low, high = find_func_by_addr(addr, funcs)
+
+    call_graph = build_call_graph(elf, funcs)
+    full_chain = find_full_call_chain(call_graph, name) if name else []
+    callers = [c for c, callees in call_graph.items() if name in callees] if name else []
+
+    src_path = None
+    src_lines = None
+    src_info = get_function_source(dwarfinfo, low, high, prefer_file=prefer_file or filename) if name else None
+    if src_info:
+        cand_path, min_ln, max_ln = src_info
+        # 首先 prefer DWARF 路径
+        if cand_path and os.path.exists(cand_path):
+            open_path = cand_path
+        else:
+            open_path = None
+            if search_cwd and cand_path:
+                base = os.path.basename(cand_path)
+                for root, dirs, files in os.walk('.'):
+                    if base in files:
+                        open_path = os.path.join(root, base)
+                        break
+
+        if open_path:
+            try:
+                with open(open_path, 'r', encoding='utf-8', errors='replace') as fh:
+                    all_lines = fh.readlines()
+                src_path = open_path
+                if min_ln is not None and max_ln is not None:
+                    src_lines = []
+                    for ln in range(min_ln, max_ln + 1):
+                        idx = ln - 1
+                        if 0 <= idx < len(all_lines):
+                            src_lines.append((ln, all_lines[idx].rstrip('\n')))
+            except Exception:
+                src_path = None
+
+    return {
+        'elf_path': elf_path,
+        'file': filename,
+        'line': line_no,
+        'addr': addr,
+        'matched_line': matched_line,
+        'func': name,
+        'func_low': low,
+        'func_high': high,
+        'call_graph': call_graph,
+        'full_chain': full_chain,
+        'callers': callers,
+        'source_path': src_path,
+        'source_lines': src_lines,
+    }
+
+
+# 标记任务完成
+try:
+    from typing import Any
+except Exception:
+    pass

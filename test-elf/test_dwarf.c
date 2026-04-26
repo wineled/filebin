@@ -132,6 +132,78 @@ typedef struct Student {
     float score;
 } Student;
 
+/* 前向声明：解决 StudentManager 调用时的隐式声明问题 */
+static void save_students(const char *path, Student *arr, int n);
+static int load_students(const char *path, Student **parr, int *pn, int *pcap);
+static int find_index_by_id(Student *arr, int n, int id);
+static void list_students(Student *arr, int n);
+static void update_student(Student *arr, int n);
+
+/* StudentManager: 封装学生数组与持久化路径 */
+typedef struct StudentManager {
+    Student *arr;
+    int count;
+    int cap;
+    char dbpath[256];
+} StudentManager;
+
+static void StudentManager_init(StudentManager *m, const char *dbpath) {
+    if (!m) return;
+    m->arr = NULL; m->count = 0; m->cap = 0;
+    if (dbpath) strncpy(m->dbpath, dbpath, sizeof(m->dbpath)-1); else m->dbpath[0] = '\0';
+    m->dbpath[sizeof(m->dbpath)-1] = '\0';
+}
+
+static void StudentManager_free(StudentManager *m) {
+    if (!m) return;
+    free(m->arr); m->arr = NULL; m->count = 0; m->cap = 0;
+}
+
+static int StudentManager_load(StudentManager *m) {
+    if (!m) return 0;
+    return load_students(m->dbpath, &m->arr, &m->count, &m->cap);
+}
+
+static void StudentManager_save(StudentManager *m) {
+    if (!m) return;
+    save_students(m->dbpath, m->arr, m->count);
+}
+
+static int StudentManager_add(StudentManager *m, const Student *s) {
+    if (!m || !s) return 0;
+    if (m->count >= m->cap) {
+        int ncap = (m->cap == 0) ? 8 : (m->cap * 2);
+        Student *tmp = realloc(m->arr, ncap * sizeof(Student));
+        if (!tmp) return 0;
+        m->arr = tmp; m->cap = ncap;
+    }
+    m->arr[m->count++] = *s;
+    return 1;
+}
+
+static int StudentManager_find_index(StudentManager *m, int id) {
+    if (!m) return -1;
+    return find_index_by_id(m->arr, m->count, id);
+}
+
+static int StudentManager_delete_by_id(StudentManager *m, int id) {
+    if (!m) return 0;
+    int idx = StudentManager_find_index(m, id);
+    if (idx < 0) return 0;
+    printf("删除学生: %d|%s|%d|%g\n", m->arr[idx].id, m->arr[idx].name, m->arr[idx].age, m->arr[idx].score);
+    m->arr[idx] = m->arr[m->count-1]; --m->count; return 1;
+}
+
+static void StudentManager_list(StudentManager *m) {
+    if (!m) return;
+    list_students(m->arr, m->count);
+}
+
+static void StudentManager_update(StudentManager *m) {
+    if (!m) return;
+    update_student(m->arr, m->count);
+}
+
 static void save_students(const char *path, Student *arr, int n) {
     FILE *f = fopen(path, "w");
     if (!f) {
@@ -144,28 +216,84 @@ static void save_students(const char *path, Student *arr, int n) {
     fclose(f);
 }
 
+/* 为了达到多层调用，将 load_students 实现拆分成多层静态辅助函数 */
+static int _load_students_layer5(const char *path, Student **parr, int *pn, int *pcap);
+static int _load_students_layer4(const char *path, Student **parr, int *pn, int *pcap);
+static int _load_students_layer3(const char *path, Student **parr, int *pn, int *pcap);
+static int _load_students_layer2(const char *path, Student **parr, int *pn, int *pcap);
+static int _load_students_layer1(const char *path, Student **parr, int *pn, int *pcap);
+
+/* 解析单行并加入数组（会调用扩容函数） */
+static int parse_line_and_add(const char *line, Student **parr, int *pn, int *pcap);
+static int ensure_capacity(Student **parr, int *pn, int *pcap, int need);
+
 static int load_students(const char *path, Student **parr, int *pn, int *pcap) {
+    if (!path) return 0;
+    return _load_students_layer1(path, parr, pn, pcap);
+}
+
+static int _load_students_layer1(const char *path, Student **parr, int *pn, int *pcap) {
+    /* 层1: 简单转发到层2 */
+    printf("开始加载学生数据（层1）\n");
+    return _load_students_layer2(path, parr, pn, pcap);
+}
+
+static int _load_students_layer2(const char *path, Student **parr, int *pn, int *pcap) {
+    /* 层2: 预处理路径（占位）然后转发 */
+    printf("处理中间层（层2）\n");
+    if (!path || !parr || !pn || !pcap) return 0;
+    return _load_students_layer3(path, parr, pn, pcap);
+}
+
+static int _load_students_layer3(const char *path, Student **parr, int *pn, int *pcap) {
+    /* 层3: 可以在这里做文件存在性检查等（占位），然后转发 */
+    printf("处理中间层（层3）\n");  
+    return _load_students_layer4(path, parr, pn, pcap);
+}
+
+static int _load_students_layer4(const char *path, Student **parr, int *pn, int *pcap) {
+    /* 层4: 最后一次包装后调用真正实现层 */
+    printf("处理中间层（层4）\n");  
+    return _load_students_layer5(path, parr, pn, pcap);
+}
+
+static int _load_students_layer5(const char *path, Student **parr, int *pn, int *pcap) {
     FILE *f = fopen(path, "r");
     if (!f) return 0;
     char line[256];
+    printf("开始加载学生数据（层5，实际实现）\n");  
+    int added = 0;
     while (fgets(line, sizeof(line), f)) {
-        int id, age; float score; char name[64];
-        /* 格式 id|name|age|score */
-        if (sscanf(line, "%d|%63[^|]|%d|%f", &id, name, &age, &score) >= 3) {
-            if (*pn >= *pcap) {
-                int ncap = (*pcap == 0) ? 8 : (*pcap * 2);
-                Student *tmp = realloc(*parr, ncap * sizeof(Student));
-                if (!tmp) break;
-                *parr = tmp; *pcap = ncap;
-            }
-            printf("加载学生: %d|%s|%d|%g\n", id, name, age, score);
-            Student *s = &(*parr)[(*pn)++];
-            s->id = id; s->age = age; s->score = score;
-            strncpy(s->name, name, sizeof(s->name)-1); s->name[sizeof(s->name)-1] = '\0';
-        }
+        /* 每行交给解析函数去处理，解析函数会确保容量并将学生加入 */
+        if (parse_line_and_add(line, parr, pn, pcap)) added++;
     }
     fclose(f);
     return 1;
+}
+
+static int parse_line_and_add(const char *line, Student **parr, int *pn, int *pcap) {
+    if (!line || !parr || !pn || !pcap) return 0;
+    int id = 0, age = 0; float score = 0.0f; char name[64] = {0};
+    /* 格式 id|name|age|score */
+    if (sscanf(line, "%d|%63[^|]|%d|%f", &id, name, &age, &score) < 3) return 0;
+    /* 打印加载信息（保持原有行为） */
+    printf("加载学生: %d|%s|%d|%g\n", id, name, age, score);
+    /* 确保容量，然后添加 */
+    if (!ensure_capacity(parr, pn, pcap, 1)) return 0;
+    Student *s = &(*parr)[(*pn)++];
+    s->id = id; s->age = age; s->score = score;
+    strncpy(s->name, name, sizeof(s->name)-1); s->name[sizeof(s->name)-1] = '\0';
+    return 1;
+}
+
+static int ensure_capacity(Student **parr, int *pn, int *pcap, int need) {
+    if (!parr || !pn || !pcap) return 0;
+    if (*pcap - *pn >= need) return 1;
+    int ncap = (*pcap == 0) ? 8 : (*pcap * 2);
+    while (ncap - *pn < need) ncap *= 2;
+    Student *tmp = realloc(*parr, ncap * sizeof(Student));
+    if (!tmp) return 0;
+    *parr = tmp; *pcap = ncap; return 1;
 }
 
 static int find_index_by_id(Student *arr, int n, int id) {
@@ -182,58 +310,49 @@ static void list_students(Student *arr, int n) {
 }
 
 int main(void) {
-    Student *students = NULL; int count = 0, cap = 0;
+    StudentManager mgr;
     const char *db = "students.txt";
+    StudentManager_init(&mgr, db);
     /* 尝试读取已有数据（若存在） */
-    load_students(db, &students, &count, &cap);
+    StudentManager_load(&mgr);
 
     while (1) {
         printf("\n学生管理系统\n");
-        printf("1) 列表  2) 添加  3) 查找  4) 删除  5) 保存  0) 退出\n");
+        printf("1) 列表  2) 添加  3) 查找  4) 删除  5) 保存  6) 更新  0) 退出\n");
         printf("请选择: ");
         char buf[128];
         if (!fgets(buf, sizeof(buf), stdin)) break;
         int cmd = atoi(buf);
         if (cmd == 0) break;
         if (cmd == 1) {
-            list_students(students, count);
+            StudentManager_list(&mgr);
         } else if (cmd == 2) {
-            if (count >= cap) {
-                int ncap = (cap == 0) ? 8 : cap * 2;
-                Student *tmp = realloc(students, ncap * sizeof(Student));
-                if (!tmp) { printf("内存分配失败\n"); continue; }
-                students = tmp; cap = ncap;
-            }
             Student s = {0};
             printf("输入学号: "); if (!fgets(buf, sizeof(buf), stdin)) break; s.id = atoi(buf);
             printf("输入姓名: "); if (!fgets(buf, sizeof(buf), stdin)) break; buf[strcspn(buf, "\n")] = '\0'; strncpy(s.name, buf, sizeof(s.name)-1);
             printf("输入年龄: "); if (!fgets(buf, sizeof(buf), stdin)) break; s.age = atoi(buf);
             printf("输入成绩: "); if (!fgets(buf, sizeof(buf), stdin)) break; s.score = (float)atof(buf);
-            students[count++] = s;
-            printf("添加成功\n");
+            if (StudentManager_add(&mgr, &s)) printf("添加成功\n"); else printf("添加失败\n");
         } else if (cmd == 3) {
             printf("输入学号: "); if (!fgets(buf, sizeof(buf), stdin)) break; int id = atoi(buf);
-            int idx = find_index_by_id(students, count, id);
+            int idx = StudentManager_find_index(&mgr, id);
             if (idx < 0) printf("未找到学号 %d\n", id);
-            else printf("%d\t%s\t%d\t%.2f\n", students[idx].id, students[idx].name, students[idx].age, students[idx].score);
+            else { Student *p = &mgr.arr[idx]; printf("%d\t%s\t%d\t%.2f\n", p->id, p->name, p->age, p->score); }
         } else if (cmd == 4) {
             printf("输入学号: "); if (!fgets(buf, sizeof(buf), stdin)) break; int id = atoi(buf);
-            int idx = find_index_by_id(students, count, id);
-            if (idx < 0) { printf("未找到学号 %d\n", id); }
-            else {
-                /* 删除：用最后一个覆盖 */
-                students[idx] = students[count-1]; --count; printf("已删除\n");
-            }
+            if (StudentManager_delete_by_id(&mgr, id)) printf("已删除\n"); else printf("未找到学号 %d\n", id);
         } else if (cmd == 5) {
-            save_students(db, students, count); printf("已保存到 %s\n", db);
+            StudentManager_save(&mgr); printf("已保存到 %s\n", db);
+        } else if (cmd == 6) {
+            StudentManager_update(&mgr);
         } else {
             printf("无效选项\n");
         }
     }
 
     /* 退出前自动保存 */
-    save_students(db, students, count);
-    free(students);
+    StudentManager_save(&mgr);
+    StudentManager_free(&mgr);
     printf("退出\n");
     return 0;
 }
@@ -288,7 +407,9 @@ static int cmp_name(const void *a, const void *b) {
 static int cmp_age(const void *a, const void *b) {
     const Student *A = a, *B = b; return (A->age - B->age);
 }
-static int cmp_score(const void *a, const void *b) { const Student *A = a, *B = b; if (A->score < B->score) return -1; if (A->score > B->score) return 1; return 0; }
+static int cmp_score(const void *a, const void *b) { const Student *A = a, *B = b; if (A->score < B->score) return -1; 
+    printf("比较分数: %.2f < %.2f\n", A->score, B->score);
+    if (A->score > B->score) return 1; return 0; }
 
 static void sort_students(Student *arr, int n, const char *by) {
     if (!arr || n <= 1) return;

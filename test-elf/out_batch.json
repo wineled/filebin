@@ -1,0 +1,840 @@
+[
+  {
+    "elf_path": "F:/CodingProjects/filebin/test-elf/test_dwarf.elf",
+    "file": "test_dwarf.c",
+    "line": 278,
+    "addr": 9732,
+    "matched_line": 278,
+    "func": "main",
+    "func_low": 9170,
+    "func_high": 10555,
+    "call_graph": {
+      "filler_func_50": [
+        "filler_func_40"
+      ],
+      "filler_func_49": [
+        "filler_func_39"
+      ],
+      "filler_func_48": [
+        "filler_func_38"
+      ],
+      "filler_func_47": [
+        "filler_func_37"
+      ],
+      "filler_func_46": [
+        "filler_func_36"
+      ],
+      "filler_func_45": [
+        "filler_func_35"
+      ],
+      "filler_func_44": [
+        "filler_func_34"
+      ],
+      "filler_func_43": [
+        "filler_func_33"
+      ],
+      "filler_func_42": [
+        "filler_func_32"
+      ],
+      "filler_func_41": [
+        "filler_func_31"
+      ],
+      "filler_func_40": [
+        "filler_func_30"
+      ],
+      "filler_func_39": [
+        "filler_func_29"
+      ],
+      "filler_func_38": [
+        "filler_func_28"
+      ],
+      "filler_func_37": [
+        "filler_func_27"
+      ],
+      "filler_func_36": [
+        "filler_func_26"
+      ],
+      "filler_func_35": [
+        "filler_func_25"
+      ],
+      "filler_func_34": [
+        "filler_func_24"
+      ],
+      "filler_func_33": [
+        "filler_func_23"
+      ],
+      "filler_func_32": [
+        "filler_func_22"
+      ],
+      "filler_func_31": [
+        "filler_func_21"
+      ],
+      "filler_func_30": [
+        "filler_func_20"
+      ],
+      "filler_func_29": [
+        "filler_func_19"
+      ],
+      "filler_func_28": [
+        "filler_func_18"
+      ],
+      "filler_func_27": [
+        "filler_func_17"
+      ],
+      "filler_func_26": [
+        "filler_func_16"
+      ],
+      "filler_func_25": [
+        "filler_func_15"
+      ],
+      "filler_func_24": [
+        "filler_func_14"
+      ],
+      "filler_func_23": [
+        "filler_func_13"
+      ],
+      "filler_func_22": [
+        "filler_func_12"
+      ],
+      "filler_func_21": [
+        "filler_func_11"
+      ],
+      "filler_func_20": [
+        "filler_func_10"
+      ],
+      "filler_func_19": [
+        "filler_func_09"
+      ],
+      "filler_func_18": [
+        "filler_func_08"
+      ],
+      "filler_func_17": [
+        "filler_func_07"
+      ],
+      "filler_func_16": [
+        "filler_func_06"
+      ],
+      "filler_func_15": [
+        "filler_func_05"
+      ],
+      "filler_func_14": [
+        "filler_func_04"
+      ],
+      "filler_func_13": [
+        "filler_func_03"
+      ],
+      "filler_func_12": [
+        "filler_func_02"
+      ],
+      "filler_func_11": [
+        "filler_func_01"
+      ],
+      "filler_func_10": [],
+      "filler_func_09": [],
+      "filler_func_08": [],
+      "filler_func_07": [],
+      "filler_func_06": [],
+      "filler_func_05": [],
+      "filler_func_04": [],
+      "filler_func_03": [],
+      "filler_func_02": [],
+      "filler_func_01": [],
+      "helper_c": [
+        "helper_b"
+      ],
+      "helper_b": [
+        "helper_a"
+      ],
+      "helper_a": [],
+      "print_help": [],
+      "export_report": [],
+      "clear_db": [],
+      "backup_db": [],
+      "load_sample_data": [],
+      "search_by_prefix": [],
+      "paginate_students": [
+        "safe_getline"
+      ],
+      "do_undo": [],
+      "push_undo": [],
+      "stats_students": [],
+      "export_csv": [],
+      "import_csv": [],
+      "sort_students": [],
+      "cmp_score": [],
+      "cmp_age": [],
+      "cmp_name": [],
+      "cmp_id": [],
+      "update_student": [
+        "find_index_by_id",
+        "safe_getline"
+      ],
+      "safe_getline": [],
+      "trim_inplace": [],
+      "main": [
+        "StudentManager_find_index",
+        "StudentManager_free",
+        "StudentManager_load",
+        "StudentManager_init",
+        "StudentManager_update",
+        "StudentManager_list",
+        "StudentManager_delete_by_id",
+        "StudentManager_add",
+        "StudentManager_save"
+      ],
+      "list_students": [],
+      "find_index_by_id": [],
+      "load_students": [],
+      "save_students": [],
+      "StudentManager_update": [
+        "update_student"
+      ],
+      "StudentManager_list": [
+        "list_students"
+      ],
+      "StudentManager_delete_by_id": [
+        "StudentManager_find_index"
+      ],
+      "StudentManager_find_index": [
+        "find_index_by_id"
+      ],
+      "StudentManager_add": [],
+      "StudentManager_save": [
+        "save_students"
+      ],
+      "StudentManager_load": [
+        "load_students"
+      ],
+      "StudentManager_free": [],
+      "StudentManager_init": [],
+      "layer1": [
+        "layer2"
+      ],
+      "layer2": [
+        "layer3"
+      ],
+      "layer3": [
+        "layer4"
+      ],
+      "layer4": [
+        "add"
+      ],
+      "add": [],
+      "add111": [],
+      "print_array": [],
+      "sort_array": []
+    },
+    "full_chain": [],
+    "callers": [],
+    "source_path": "test_dwarf.c",
+    "source_lines": [
+      [
+        256,
+        "int main(void) {"
+      ],
+      [
+        257,
+        "    StudentManager mgr;"
+      ],
+      [
+        258,
+        "    const char *db = \"students.txt\";"
+      ],
+      [
+        259,
+        "    StudentManager_init(&mgr, db);"
+      ],
+      [
+        260,
+        "    /* 尝试读取已有数据（若存在） */"
+      ],
+      [
+        261,
+        "    StudentManager_load(&mgr);"
+      ],
+      [
+        262,
+        ""
+      ],
+      [
+        263,
+        "    while (1) {"
+      ],
+      [
+        264,
+        "        printf(\"\\n学生管理系统\\n\");"
+      ],
+      [
+        265,
+        "        printf(\"1) 列表  2) 添加  3) 查找  4) 删除  5) 保存  6) 更新  0) 退出\\n\");"
+      ],
+      [
+        266,
+        "        printf(\"请选择: \");"
+      ],
+      [
+        267,
+        "        char buf[128];"
+      ],
+      [
+        268,
+        "        if (!fgets(buf, sizeof(buf), stdin)) break;"
+      ],
+      [
+        269,
+        "        int cmd = atoi(buf);"
+      ],
+      [
+        270,
+        "        if (cmd == 0) break;"
+      ],
+      [
+        271,
+        "        if (cmd == 1) {"
+      ],
+      [
+        272,
+        "            StudentManager_list(&mgr);"
+      ],
+      [
+        273,
+        "        } else if (cmd == 2) {"
+      ],
+      [
+        274,
+        "            Student s = {0};"
+      ],
+      [
+        275,
+        "            printf(\"输入学号: \"); if (!fgets(buf, sizeof(buf), stdin)) break; s.id = atoi(buf);"
+      ],
+      [
+        276,
+        "            printf(\"输入姓名: \"); if (!fgets(buf, sizeof(buf), stdin)) break; buf[strcspn(buf, \"\\n\")] = '\\0'; strncpy(s.name, buf, sizeof(s.name)-1);"
+      ],
+      [
+        277,
+        "            printf(\"输入年龄: \"); if (!fgets(buf, sizeof(buf), stdin)) break; s.age = atoi(buf);"
+      ],
+      [
+        278,
+        "            printf(\"输入成绩: \"); if (!fgets(buf, sizeof(buf), stdin)) break; s.score = (float)atof(buf);"
+      ],
+      [
+        279,
+        "            if (StudentManager_add(&mgr, &s)) printf(\"添加成功\\n\"); else printf(\"添加失败\\n\");"
+      ],
+      [
+        280,
+        "        } else if (cmd == 3) {"
+      ],
+      [
+        281,
+        "            printf(\"输入学号: \"); if (!fgets(buf, sizeof(buf), stdin)) break; int id = atoi(buf);"
+      ],
+      [
+        282,
+        "            int idx = StudentManager_find_index(&mgr, id);"
+      ],
+      [
+        283,
+        "            if (idx < 0) printf(\"未找到学号 %d\\n\", id);"
+      ],
+      [
+        284,
+        "            else { Student *p = &mgr.arr[idx]; printf(\"%d\\t%s\\t%d\\t%.2f\\n\", p->id, p->name, p->age, p->score); }"
+      ],
+      [
+        285,
+        "        } else if (cmd == 4) {"
+      ],
+      [
+        286,
+        "            printf(\"输入学号: \"); if (!fgets(buf, sizeof(buf), stdin)) break; int id = atoi(buf);"
+      ],
+      [
+        287,
+        "            if (StudentManager_delete_by_id(&mgr, id)) printf(\"已删除\\n\"); else printf(\"未找到学号 %d\\n\", id);"
+      ],
+      [
+        288,
+        "        } else if (cmd == 5) {"
+      ],
+      [
+        289,
+        "            StudentManager_save(&mgr); printf(\"已保存到 %s\\n\", db);"
+      ],
+      [
+        290,
+        "        } else if (cmd == 6) {"
+      ],
+      [
+        291,
+        "            StudentManager_update(&mgr);"
+      ],
+      [
+        292,
+        "        } else {"
+      ],
+      [
+        293,
+        "            printf(\"无效选项\\n\");"
+      ],
+      [
+        294,
+        "        }"
+      ],
+      [
+        295,
+        "    }"
+      ],
+      [
+        296,
+        ""
+      ],
+      [
+        297,
+        "    /* 退出前自动保存 */"
+      ],
+      [
+        298,
+        "    StudentManager_save(&mgr);"
+      ],
+      [
+        299,
+        "    StudentManager_free(&mgr);"
+      ],
+      [
+        300,
+        "    printf(\"退出\\n\");"
+      ],
+      [
+        301,
+        "    return 0;"
+      ],
+      [
+        302,
+        "}"
+      ]
+    ]
+  },
+  {
+    "elf_path": "F:/CodingProjects/filebin/test-elf/test_dwarf.elf",
+    "file": "test_dwarf.c",
+    "line": 266,
+    "addr": 9284,
+    "matched_line": 266,
+    "func": "main",
+    "func_low": 9170,
+    "func_high": 10555,
+    "call_graph": {
+      "filler_func_50": [
+        "filler_func_40"
+      ],
+      "filler_func_49": [
+        "filler_func_39"
+      ],
+      "filler_func_48": [
+        "filler_func_38"
+      ],
+      "filler_func_47": [
+        "filler_func_37"
+      ],
+      "filler_func_46": [
+        "filler_func_36"
+      ],
+      "filler_func_45": [
+        "filler_func_35"
+      ],
+      "filler_func_44": [
+        "filler_func_34"
+      ],
+      "filler_func_43": [
+        "filler_func_33"
+      ],
+      "filler_func_42": [
+        "filler_func_32"
+      ],
+      "filler_func_41": [
+        "filler_func_31"
+      ],
+      "filler_func_40": [
+        "filler_func_30"
+      ],
+      "filler_func_39": [
+        "filler_func_29"
+      ],
+      "filler_func_38": [
+        "filler_func_28"
+      ],
+      "filler_func_37": [
+        "filler_func_27"
+      ],
+      "filler_func_36": [
+        "filler_func_26"
+      ],
+      "filler_func_35": [
+        "filler_func_25"
+      ],
+      "filler_func_34": [
+        "filler_func_24"
+      ],
+      "filler_func_33": [
+        "filler_func_23"
+      ],
+      "filler_func_32": [
+        "filler_func_22"
+      ],
+      "filler_func_31": [
+        "filler_func_21"
+      ],
+      "filler_func_30": [
+        "filler_func_20"
+      ],
+      "filler_func_29": [
+        "filler_func_19"
+      ],
+      "filler_func_28": [
+        "filler_func_18"
+      ],
+      "filler_func_27": [
+        "filler_func_17"
+      ],
+      "filler_func_26": [
+        "filler_func_16"
+      ],
+      "filler_func_25": [
+        "filler_func_15"
+      ],
+      "filler_func_24": [
+        "filler_func_14"
+      ],
+      "filler_func_23": [
+        "filler_func_13"
+      ],
+      "filler_func_22": [
+        "filler_func_12"
+      ],
+      "filler_func_21": [
+        "filler_func_11"
+      ],
+      "filler_func_20": [
+        "filler_func_10"
+      ],
+      "filler_func_19": [
+        "filler_func_09"
+      ],
+      "filler_func_18": [
+        "filler_func_08"
+      ],
+      "filler_func_17": [
+        "filler_func_07"
+      ],
+      "filler_func_16": [
+        "filler_func_06"
+      ],
+      "filler_func_15": [
+        "filler_func_05"
+      ],
+      "filler_func_14": [
+        "filler_func_04"
+      ],
+      "filler_func_13": [
+        "filler_func_03"
+      ],
+      "filler_func_12": [
+        "filler_func_02"
+      ],
+      "filler_func_11": [
+        "filler_func_01"
+      ],
+      "filler_func_10": [],
+      "filler_func_09": [],
+      "filler_func_08": [],
+      "filler_func_07": [],
+      "filler_func_06": [],
+      "filler_func_05": [],
+      "filler_func_04": [],
+      "filler_func_03": [],
+      "filler_func_02": [],
+      "filler_func_01": [],
+      "helper_c": [
+        "helper_b"
+      ],
+      "helper_b": [
+        "helper_a"
+      ],
+      "helper_a": [],
+      "print_help": [],
+      "export_report": [],
+      "clear_db": [],
+      "backup_db": [],
+      "load_sample_data": [],
+      "search_by_prefix": [],
+      "paginate_students": [
+        "safe_getline"
+      ],
+      "do_undo": [],
+      "push_undo": [],
+      "stats_students": [],
+      "export_csv": [],
+      "import_csv": [],
+      "sort_students": [],
+      "cmp_score": [],
+      "cmp_age": [],
+      "cmp_name": [],
+      "cmp_id": [],
+      "update_student": [
+        "find_index_by_id",
+        "safe_getline"
+      ],
+      "safe_getline": [],
+      "trim_inplace": [],
+      "main": [
+        "StudentManager_find_index",
+        "StudentManager_free",
+        "StudentManager_load",
+        "StudentManager_init",
+        "StudentManager_update",
+        "StudentManager_list",
+        "StudentManager_delete_by_id",
+        "StudentManager_add",
+        "StudentManager_save"
+      ],
+      "list_students": [],
+      "find_index_by_id": [],
+      "load_students": [],
+      "save_students": [],
+      "StudentManager_update": [
+        "update_student"
+      ],
+      "StudentManager_list": [
+        "list_students"
+      ],
+      "StudentManager_delete_by_id": [
+        "StudentManager_find_index"
+      ],
+      "StudentManager_find_index": [
+        "find_index_by_id"
+      ],
+      "StudentManager_add": [],
+      "StudentManager_save": [
+        "save_students"
+      ],
+      "StudentManager_load": [
+        "load_students"
+      ],
+      "StudentManager_free": [],
+      "StudentManager_init": [],
+      "layer1": [
+        "layer2"
+      ],
+      "layer2": [
+        "layer3"
+      ],
+      "layer3": [
+        "layer4"
+      ],
+      "layer4": [
+        "add"
+      ],
+      "add": [],
+      "add111": [],
+      "print_array": [],
+      "sort_array": []
+    },
+    "full_chain": [],
+    "callers": [],
+    "source_path": "test_dwarf.c",
+    "source_lines": [
+      [
+        256,
+        "int main(void) {"
+      ],
+      [
+        257,
+        "    StudentManager mgr;"
+      ],
+      [
+        258,
+        "    const char *db = \"students.txt\";"
+      ],
+      [
+        259,
+        "    StudentManager_init(&mgr, db);"
+      ],
+      [
+        260,
+        "    /* 尝试读取已有数据（若存在） */"
+      ],
+      [
+        261,
+        "    StudentManager_load(&mgr);"
+      ],
+      [
+        262,
+        ""
+      ],
+      [
+        263,
+        "    while (1) {"
+      ],
+      [
+        264,
+        "        printf(\"\\n学生管理系统\\n\");"
+      ],
+      [
+        265,
+        "        printf(\"1) 列表  2) 添加  3) 查找  4) 删除  5) 保存  6) 更新  0) 退出\\n\");"
+      ],
+      [
+        266,
+        "        printf(\"请选择: \");"
+      ],
+      [
+        267,
+        "        char buf[128];"
+      ],
+      [
+        268,
+        "        if (!fgets(buf, sizeof(buf), stdin)) break;"
+      ],
+      [
+        269,
+        "        int cmd = atoi(buf);"
+      ],
+      [
+        270,
+        "        if (cmd == 0) break;"
+      ],
+      [
+        271,
+        "        if (cmd == 1) {"
+      ],
+      [
+        272,
+        "            StudentManager_list(&mgr);"
+      ],
+      [
+        273,
+        "        } else if (cmd == 2) {"
+      ],
+      [
+        274,
+        "            Student s = {0};"
+      ],
+      [
+        275,
+        "            printf(\"输入学号: \"); if (!fgets(buf, sizeof(buf), stdin)) break; s.id = atoi(buf);"
+      ],
+      [
+        276,
+        "            printf(\"输入姓名: \"); if (!fgets(buf, sizeof(buf), stdin)) break; buf[strcspn(buf, \"\\n\")] = '\\0'; strncpy(s.name, buf, sizeof(s.name)-1);"
+      ],
+      [
+        277,
+        "            printf(\"输入年龄: \"); if (!fgets(buf, sizeof(buf), stdin)) break; s.age = atoi(buf);"
+      ],
+      [
+        278,
+        "            printf(\"输入成绩: \"); if (!fgets(buf, sizeof(buf), stdin)) break; s.score = (float)atof(buf);"
+      ],
+      [
+        279,
+        "            if (StudentManager_add(&mgr, &s)) printf(\"添加成功\\n\"); else printf(\"添加失败\\n\");"
+      ],
+      [
+        280,
+        "        } else if (cmd == 3) {"
+      ],
+      [
+        281,
+        "            printf(\"输入学号: \"); if (!fgets(buf, sizeof(buf), stdin)) break; int id = atoi(buf);"
+      ],
+      [
+        282,
+        "            int idx = StudentManager_find_index(&mgr, id);"
+      ],
+      [
+        283,
+        "            if (idx < 0) printf(\"未找到学号 %d\\n\", id);"
+      ],
+      [
+        284,
+        "            else { Student *p = &mgr.arr[idx]; printf(\"%d\\t%s\\t%d\\t%.2f\\n\", p->id, p->name, p->age, p->score); }"
+      ],
+      [
+        285,
+        "        } else if (cmd == 4) {"
+      ],
+      [
+        286,
+        "            printf(\"输入学号: \"); if (!fgets(buf, sizeof(buf), stdin)) break; int id = atoi(buf);"
+      ],
+      [
+        287,
+        "            if (StudentManager_delete_by_id(&mgr, id)) printf(\"已删除\\n\"); else printf(\"未找到学号 %d\\n\", id);"
+      ],
+      [
+        288,
+        "        } else if (cmd == 5) {"
+      ],
+      [
+        289,
+        "            StudentManager_save(&mgr); printf(\"已保存到 %s\\n\", db);"
+      ],
+      [
+        290,
+        "        } else if (cmd == 6) {"
+      ],
+      [
+        291,
+        "            StudentManager_update(&mgr);"
+      ],
+      [
+        292,
+        "        } else {"
+      ],
+      [
+        293,
+        "            printf(\"无效选项\\n\");"
+      ],
+      [
+        294,
+        "        }"
+      ],
+      [
+        295,
+        "    }"
+      ],
+      [
+        296,
+        ""
+      ],
+      [
+        297,
+        "    /* 退出前自动保存 */"
+      ],
+      [
+        298,
+        "    StudentManager_save(&mgr);"
+      ],
+      [
+        299,
+        "    StudentManager_free(&mgr);"
+      ],
+      [
+        300,
+        "    printf(\"退出\\n\");"
+      ],
+      [
+        301,
+        "    return 0;"
+      ],
+      [
+        302,
+        "}"
+      ]
+    ]
+  }
+]
