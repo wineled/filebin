@@ -137,5 +137,6 @@ int main() {
     printf("Result: %d\n", result);
     add(20, 30);
     add111(5, 15);
+    layer1(100, 200);
     return 0;
 }

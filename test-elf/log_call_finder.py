@@ -10,7 +10,7 @@ from capstone import Cs, CS_ARCH_ARM, CS_MODE_ARM, CS_ARCH_ARM64, CS_ARCH_X86, C
 
 # ========== 配置区域 ==========
 ELF_PATH = r"F:\CodingProjects\filebin\test-elf\test_dwarf.elf"
-LOCATION = "test_dwarf.c:102"  # 要查的 "文件名:行号"
+LOCATION = "test_dwarf.c:131"  # 要查的 "文件名:行号"
 # =============================
 
 
