@@ -5,12 +5,13 @@
 """
 import re
 import sys
+import os
 from elftools.elf.elffile import ELFFile
 from capstone import Cs, CS_ARCH_ARM, CS_MODE_ARM, CS_ARCH_ARM64, CS_ARCH_X86, CS_MODE_32, CS_MODE_64
 
 # ========== 配置区域 ==========
 ELF_PATH = r"F:\CodingProjects\filebin\test-elf\test_dwarf.elf"
-LOCATION = "test_dwarf.c:131"  # 要查的 "文件名:行号"
+LOCATION = "test_dwarf.c:278"  # 要查的 "文件名:行号"
 # =============================
 
 
@@ -126,6 +127,90 @@ def find_func_by_addr(addr, funcs):
         if low <= addr < high:
             return name, low, high
     return None, None, None
+
+
+def get_function_source(dwarfinfo, low, high, prefer_file=None):
+    """返回 (file_path, min_line, max_line) 覆盖函数地址区间的源代码行范围。
+
+    prefer_file: 可选的文件名提示（basename 或包含的路径片段），用于在多个文件匹配时优先选择。
+    """
+    files = []
+    for cu in dwarfinfo.iter_CUs():
+        try:
+            lprog = dwarfinfo.line_program_for_CU(cu)
+        except Exception:
+            continue
+        header = lprog.header
+        file_entries = header.get('file_entry', [])
+        inc_dirs = header.get('include_directory', [])
+
+        for entry in lprog.get_entries():
+            state = entry.state
+            if state is None or state.address is None:
+                continue
+            if not (low <= state.address < high):
+                continue
+
+            file_idx = state.file - 1
+            if file_idx < 0 or file_idx >= len(file_entries):
+                continue
+
+            fe = file_entries[file_idx]
+            if isinstance(fe, dict):
+                raw_name_b = fe.get('name', b'')
+                dir_idx = fe.get('directory_index', 0)
+            else:
+                raw_name_b = getattr(fe, 'name', None)
+                dir_idx = getattr(fe, 'directory_index', 0)
+
+            if isinstance(raw_name_b, (bytes, bytearray)):
+                try:
+                    raw_name = raw_name_b.decode()
+                except Exception:
+                    raw_name = ''
+            elif isinstance(raw_name_b, str):
+                raw_name = raw_name_b
+            else:
+                raw_name = ''
+
+            if not raw_name:
+                continue
+
+            if dir_idx > 0 and dir_idx <= len(inc_dirs):
+                dir_entry = inc_dirs[dir_idx - 1]
+                try:
+                    dir_prefix = dir_entry.decode() if isinstance(dir_entry, (bytes, bytearray)) else str(dir_entry)
+                except Exception:
+                    dir_prefix = str(dir_entry)
+                fname = dir_prefix.rstrip('/\\') + '/' + raw_name
+            else:
+                fname = raw_name
+
+            files.append((fname, state.line))
+
+    if not files:
+        return None
+
+    # 选择最合适的文件路径
+    file_paths = [p for p, ln in files if p]
+    if not file_paths:
+        return None
+
+    chosen = None
+    if prefer_file:
+        for p in set(file_paths):
+            if os.path.basename(p) == prefer_file or prefer_file in p:
+                chosen = p
+                break
+
+    if not chosen:
+        from collections import Counter
+        chosen = Counter(file_paths).most_common(1)[0][0]
+
+    lines = [ln for p, ln in files if p == chosen and ln is not None]
+    if not lines:
+        return (chosen, None, None)
+    return (chosen, min(lines), max(lines))
 
 
 def get_arch_info(elf):
@@ -293,6 +378,45 @@ def main():
 
     print("[*] 搜索完整调用链...")
     full_chain = find_full_call_chain(call_graph, name)
+
+    # 输出当前函数的源代码（若可用）
+    src_info = get_function_source(dwarfinfo, low, high, prefer_file=filename)
+    if src_info:
+        src_path, min_ln, max_ln = src_info
+        print(f"[*] 尝试读取源文件: {src_path}")
+        # 直接尝试打开原路径
+        open_path = None
+        try:
+            if os.path.exists(src_path):
+                open_path = src_path
+        except Exception:
+            open_path = None
+
+        # 如果找不到，按 basename 在工作目录递归搜索
+        if not open_path:
+            base = os.path.basename(src_path)
+            for root, dirs, files in os.walk('.'):
+                if base in files:
+                    open_path = os.path.join(root, base)
+                    break
+
+        if open_path:
+            try:
+                with open(open_path, 'r', encoding='utf-8', errors='replace') as fh:
+                    all_lines = fh.readlines()
+                if min_ln is None or max_ln is None:
+                    print(f"[!] 未能确定函数的行范围，无法截取源代码（文件: {open_path}）")
+                else:
+                    print(f"[+] 函数源代码：{os.path.basename(open_path)}:{min_ln}-{max_ln}")
+                    for ln in range(min_ln, max_ln + 1):
+                        idx = ln - 1
+                        if 0 <= idx < len(all_lines):
+                            print(f"{ln:5d}: {all_lines[idx].rstrip()}" )
+            except Exception as e:
+                print(f"[!] 打开源文件失败: {e}")
+        else:
+            print(f"[!] 未能在磁盘上找到源文件: {src_path}")
+
 
     if full_chain:
         print("[+] 完整调用链 (从叶子到根):")
