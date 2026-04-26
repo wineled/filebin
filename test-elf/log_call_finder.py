@@ -138,6 +138,27 @@ def _resolve_file_path(fe, inc_dirs):
     return fname
 
 
+def _get_section_addr(section):
+    """Safely retrieve a section's load/base address (sh_addr).
+
+    Handles different section object shapes used by pyelftools or wrappers.
+    Returns 0 if address cannot be determined.
+    """
+    try:
+        # some Section behave like dict
+        return int(section['sh_addr'])
+    except Exception:
+        pass
+    try:
+        return int(section.header.get('sh_addr', 0))
+    except Exception:
+        pass
+    try:
+        return int(getattr(section, 'header', {}).get('sh_addr', 0))
+    except Exception:
+        return 0
+
+
 def get_function_source(dwarfinfo, low, high, prefer_file=None):
     """返回 (file_path, min_line, max_line) 覆盖函数地址区间的源代码行范围。
 
@@ -217,14 +238,7 @@ def build_call_graph(elf, funcs):
         raise ValueError("未找到 .text 段")
     code = text.data()
     # 兼容不同 Section 对象的地址获取方式
-    base = None
-    try:
-        base = text['sh_addr']
-    except Exception:
-        try:
-            base = text.header.get('sh_addr', 0)
-        except Exception:
-            base = getattr(text, 'header', {}).get('sh_addr', 0)
+    base = _get_section_addr(text)
 
     arch, mode = get_arch_info(elf)
     md = Cs(arch, mode)

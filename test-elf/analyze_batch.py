@@ -12,7 +12,7 @@ import os
 from log_call_finder import analyze_location
 
 
-def run_batch(elf_path, locations, out_json=None, out_csv=None, search_cwd=True):
+def run_batch(elf_path, locations, out_json=None, out_csv=None, search_cwd=True, sdv=False):
     results = []
     for loc in locations:
         try:
@@ -30,22 +30,36 @@ def run_batch(elf_path, locations, out_json=None, out_csv=None, search_cwd=True)
         print(f'Wrote JSON -> {out_json}')
 
     if out_csv:
-        # flatten results into CSV rows
-        with open(out_csv, 'w', encoding='utf-8', newline='') as fh:
-            writer = csv.writer(fh)
-            header = ['location', 'elf_path', 'file', 'line', 'addr', 'matched_line', 'func', 'func_low', 'func_high', 'callers', 'full_chain', 'source_path', 'source_snippet']
-            writer.writerow(header)
-            for r in results:
-                loc = f"{r.get('file') or ''}:{r.get('line') or ''}" if not r.get('file') is None else r.get('location', '')
-                addr = f"0x{r['addr']:x}" if r.get('addr') else ''
-                callers = ';'.join(r.get('callers') or [])
-                full_chain = ';'.join(r.get('full_chain') or [])
-                src_path = r.get('source_path') or ''
-                snippet = ''
-                if r.get('source_lines'):
-                    snippet = '\n'.join([f"{ln}:{text}" for ln, text in r['source_lines']])
-                writer.writerow([loc, r.get('elf_path',''), r.get('file',''), r.get('line',''), addr, r.get('matched_line',''), r.get('func',''), r.get('func_low',''), r.get('func_high',''), callers, full_chain, src_path, snippet])
-        print(f'Wrote CSV -> {out_csv}')
+        if sdv:
+            # SDV compact CSV: file,line,func,addr,call_depth
+            with open(out_csv, 'w', encoding='utf-8', newline='') as fh:
+                writer = csv.writer(fh)
+                writer.writerow(['file', 'line', 'func', 'addr', 'call_depth'])
+                for r in results:
+                    file = r.get('file') or ''
+                    line = r.get('line') or ''
+                    func = r.get('func') or ''
+                    addr = f"0x{r['addr']:x}" if r.get('addr') else ''
+                    call_depth = len(r.get('full_chain') or [])
+                    writer.writerow([file, line, func, addr, call_depth])
+            print(f'Wrote SDV CSV -> {out_csv}')
+        else:
+            # flatten results into CSV rows
+            with open(out_csv, 'w', encoding='utf-8', newline='') as fh:
+                writer = csv.writer(fh)
+                header = ['location', 'elf_path', 'file', 'line', 'addr', 'matched_line', 'func', 'func_low', 'func_high', 'callers', 'full_chain', 'source_path', 'source_snippet']
+                writer.writerow(header)
+                for r in results:
+                    loc = f"{r.get('file') or ''}:{r.get('line') or ''}" if not r.get('file') is None else r.get('location', '')
+                    addr = f"0x{r['addr']:x}" if r.get('addr') else ''
+                    callers = ';'.join(r.get('callers') or [])
+                    full_chain = ';'.join(r.get('full_chain') or [])
+                    src_path = r.get('source_path') or ''
+                    snippet = ''
+                    if r.get('source_lines'):
+                        snippet = '\n'.join([f"{ln}:{text}" for ln, text in r['source_lines']])
+                    writer.writerow([loc, r.get('elf_path',''), r.get('file',''), r.get('line',''), addr, r.get('matched_line',''), r.get('func',''), r.get('func_low',''), r.get('func_high',''), callers, full_chain, src_path, snippet])
+            print(f'Wrote CSV -> {out_csv}')
 
     return results
 
@@ -58,6 +72,7 @@ def main():
     p.add_argument('--discover', '-d', help='从 ELF 的 DWARF 中发现指定源文件的所有行号，参数为源文件名（basename 或部分路径）')
     p.add_argument('--json', help='输出 JSON 文件路径')
     p.add_argument('--csv', help='输出 CSV 文件路径')
+    p.add_argument('--sdv', action='store_true', help='生成 SDV 专用 CSV（字段: file,line,func,addr,call_depth）')
     p.add_argument('--no-search-cwd', dest='search_cwd', action='store_false', help='不要在当前工作目录搜索源文件')
     args = p.parse_args()
 
@@ -126,7 +141,7 @@ def main():
         # 默认示例
         locs = ['test_dwarf.c:278', 'test_dwarf.c:266']
 
-    run_batch(args.elf, locs, out_json=args.json, out_csv=args.csv, search_cwd=args.search_cwd)
+    run_batch(args.elf, locs, out_json=args.json, out_csv=args.csv, search_cwd=args.search_cwd, sdv=args.sdv)
 
 
 if __name__ == '__main__':
